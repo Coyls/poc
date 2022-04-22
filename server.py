@@ -45,10 +45,12 @@ class Storage:
         if key == "/proximity":
             if self.proximity.canActivate():
                 self.proximity.setValue(int(val))
+                subprocess.run(['espeak','-vfr+f4','-s150', "Bonjour, Humain !"])
         if key == "/switch":
             self.switch.setValue(int(val))
         if key == "/humidity-ground":
             self.humidityGround.setValue(int(val))
+            subprocess.run(['espeak','-vfr+f4','-s150', "Merci Humain !"])
             
         
 class Command:
@@ -73,8 +75,8 @@ class Hub:
         if key == "/switch" and self.storage.proximity.value == 1:
             lastWatering = self.storage.proximity.lastTrigger
             last = f"La plante à été aroser pour la derniere fois le {lastWatering.day}, {lastWatering.month} à {lastWatering.hour} heures et {lastWatering.minute} minutes."
-            subprocess.run(['espeak','-g','3' ,'-v' ,'fr',f"la temperature est de {self.storage.temp.value} degré"])
-            subprocess.run(['espeak','-g','3' ,'-v' ,'fr', last])
+            subprocess.run(['espeak','-vfr+f4','-s150',f"la temperature est de {self.storage.temp.value} degré"])
+            subprocess.run(['espeak','-vfr+f4','-s150', last])
             print(last)
             time.sleep(2)
 

@@ -2,7 +2,6 @@
 # launcher.sh
 # Execute POC
 
-sleep 30
 cd /home/pi/Documents/poc
 python3 ./server.py &
 sleep 3

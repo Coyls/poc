@@ -15,6 +15,9 @@ from blue_st_sdk.node import NodeListener
 from protocol import ProtocolGenerator
 from websocket import create_connection
 
+# time.sleep(2)
+
+
 # CONSTANTS
 
 # Presentation message.
@@ -143,9 +146,9 @@ def main(argv):
 
             # Connecting to the device.
             print('Connecting to %s...' % (device.get_name()))
-            if not device.connect():
+            """ if not device.connect():
                 print('Connection failed.\n')
-                continue
+                continue """
 
 
             print("Connected !")

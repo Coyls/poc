@@ -11,6 +11,8 @@ channel = 20
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(channel, GPIO.IN)
 
+# time.sleep(2)
+
 ws = create_connection("ws://localhost:8000")
 
 time.sleep(2)

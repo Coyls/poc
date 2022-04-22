@@ -8,6 +8,8 @@ SENSOR_PIN = 23
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(SENSOR_PIN, GPIO.IN)
 
+# time.sleep(2)
+
 ws = create_connection("ws://localhost:8000")
  
 def my_callback(channel):
