@@ -15,7 +15,6 @@ from blue_st_sdk.node import NodeListener
 from protocol import ProtocolGenerator
 from websocket import create_connection
 
-# time.sleep(2)
 
 
 # CONSTANTS
@@ -31,6 +30,11 @@ SCANNING_TIME_s = 5
 til = "BCN-423"
 ws = create_connection("ws://localhost:8000")
 
+time.sleep(2)
+
+# name = ProtocolGenerator("/name", "switch")
+
+# ws.send(name.create())
 
 # FUNCTIONS
 
@@ -55,7 +59,7 @@ class MyManagerListener(ManagerListener):
     # @param manager Manager instance that starts/stops the process.
     # @param enabled True if a new discovery starts, False otherwise.
     #
-    def on_discovery_change(self, manager, enabled):
+    def on_discovery_change(self, manag56418er, enabled):
         print('Discovery %s.' % ('started' if enabled else 'stopped'))
         if not enabled:
             print()
@@ -131,8 +135,6 @@ def main(argv):
                 if not discovered_devices:
                     isConnected = False
                     print("retry...")
-                    # print('No Bluetooth devices found. Exiting...\n')
-                    # sys.exit(0)
                 else:
                     isConnected = True
 

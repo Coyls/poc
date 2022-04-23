@@ -2,27 +2,40 @@ import RPi.GPIO as GPIO
 import time
 from websocket import create_connection
 from protocol import ProtocolGenerator
- 
-SENSOR_PIN = 23
- 
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(SENSOR_PIN, GPIO.IN)
 
-# time.sleep(2)
+class ProximitySensor:
+    SENSOR_PIN = 23
 
-ws = create_connection("ws://localhost:8000")
- 
-def my_callback(channel):
-    data = ProtocolGenerator("/proximity", "1")
-    ws.send(data.create())
-    print('There was a movement!')
- 
-try:
-    time.sleep(5)
-    GPIO.add_event_detect(SENSOR_PIN , GPIO.RISING, callback=my_callback)
-    while True:
-        time.sleep(100)
-except KeyboardInterrupt:
-    print("Finish...")
+    def __init__(self, name : str, data : str) -> None:
+        self.name = name
+        self.data = data
+        self.ws = create_connection("ws://localhost:8000")
+        time.sleep(3)
+        self.setupHardware()
+        self.initName()
+    
+    def start(self):
+        try:
+            while True:
+                print(self.name , " is working !")
+                time.sleep(10)
+        except KeyboardInterrupt:
+                print(self.name , " shutdown !")
+                GPIO.cleanup()
 
-GPIO.cleanup()
+    def initName(self):
+        data = ProtocolGenerator("/name", self.name)
+        self.ws.send(data.create())
+
+    def setupHardware(self):
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.SENSOR_PIN, GPIO.IN)
+        GPIO.add_event_detect(self.SENSOR_PIN , GPIO.RISING, callback=self.sensor_callback)
+
+    def sensor_callback(self,channel):
+        data = ProtocolGenerator("/proximity", self.data)
+        self.ws.send(data.create())
+        print('There was a movement!')
+
+prx = ProximitySensor("Proximity", "1")
+prx.start()

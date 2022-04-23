@@ -1,8 +1,26 @@
+from pydoc import cli
+from typing import Any, List
 from simple_websocket_server import WebSocketServer, WebSocket
 from protocol import ProtocolDecodeur
 from datetime import date, datetime, time
 import subprocess
 
+class ConnectionManager:
+    clients = {}
+    discClients : list[str] = []
+
+    def addClient(self,client : Any):
+        self.clients[client] = ""
+
+    def setClientName(self,client : Any, name : str):
+        self.clients[client] = name
+
+    def removeClient(self,client : Any):
+        print(self.clients[client], " disconnected")
+        self.discClients.append(self.clients[client])
+        self.clients.pop(client)
+        
+    
 class Sensor:
     value = 0
     lastTrigger = datetime(2000,1,1)
@@ -40,8 +58,11 @@ class Storage:
     humidityGround = Sensor(10, "last-trigger.txt")
 
     def setValue(self, key: str, val: str):
+        if key == "/button":
+            print("Button")
         if key == "/temp":
             self.temp.setValue(int(val))
+            print(val)
         if key == "/proximity":
             if self.proximity.canActivate():
                 self.proximity.setValue(int(val))
@@ -67,18 +88,23 @@ class Hub:
 
     storage = Storage()
 
-    def handle(self, data : str):
-        dataTr = ProtocolDecodeur(data)
+    def handle(self, client: Any):
+        dataTr = ProtocolDecodeur(client.data)
         [key, val] = dataTr.getKeyValue()
-        self.storage.setValue(key, val)       
 
-        if key == "/switch" and self.storage.proximity.value == 1:
-            lastWatering = self.storage.proximity.lastTrigger
-            last = f"La plante à été aroser pour la derniere fois le {lastWatering.day}, {lastWatering.month} à {lastWatering.hour} heures et {lastWatering.minute} minutes."
-            subprocess.run(['espeak','-vfr+f4','-s150',f"la temperature est de {self.storage.temp.value} degré"])
-            subprocess.run(['espeak','-vfr+f4','-s150', last])
-            print(last)
-            time.sleep(2)
+        if key == "/name":
+            print(key , val)
+            connectionManager.setClientName(client,val)
+        else:
+            self.storage.setValue(key, val)
+
+            if key == "/switch" and self.storage.proximity.value == 1:
+                lastWatering = self.storage.proximity.lastTrigger
+                last = f"La plante à été aroser pour la derniere fois le {lastWatering.day}, {lastWatering.month} à {lastWatering.hour} heures et {lastWatering.minute} minutes."
+                subprocess.run(['espeak','-vfr+f4','-s150',f"la temperature est de {self.storage.temp.value} degré"])
+                subprocess.run(['espeak','-vfr+f4','-s150', last])
+                print(last)
+                time.sleep(2)
 
             
 
@@ -87,19 +113,23 @@ class Hub:
 class SimpleChat(WebSocket):
 
     hub = Hub()
-
+    
     def handle(self):
-        self.hub.handle(self.data)
+        self.hub.handle(self)
+
         
     def connected(self):
-        clients.append(self)
         print(self.address, 'connected')
+        connectionManager.addClient(self)
+        
 
     def handle_close(self):
-        clients.remove(self)
         print(self.address, 'closed')
+        connectionManager.removeClient(self)
         
 clients = []
+connectionManager = ConnectionManager()
+  
 
 server = WebSocketServer('', 8000, SimpleChat)
 server.serve_forever()

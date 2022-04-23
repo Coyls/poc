@@ -1,28 +1,44 @@
 from websocket import create_connection
 import RPi.GPIO as GPIO
-import dht11
 import time
 from protocol import ProtocolGenerator
 
-ws = create_connection("ws://localhost:8000")
+class Button:
+    SENSOR_PIN = 12
+
+    def __init__(self, name : str, data : str) -> None:
+        self.name = name
+        self.data = data
+        self.ws = create_connection("ws://localhost:8000")
+        time.sleep(3)
+        self.setupHardware()
+        self.initName()
+    
+    def start(self):
+        while True:
+            print(self.name , " is working !")
+            time.sleep(10)
+
+    def initName(self):
+        data = ProtocolGenerator("/name", self.name)
+        self.ws.send(data.create())
+
+    def setupHardware(self):
+        GPIO.setwarnings(False)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.SENSOR_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+        GPIO.add_event_detect(self.SENSOR_PIN, GPIO.RISING, callback=self.sensor_callback)
+
+    def sensor_callback(self,channel):
+        print('==============')
+        print("button pushed")
+        print("Sending data")
+        data = ProtocolGenerator("/button", self.data)
+        self.ws.send(data.create())
+        print('==============')
 
 
-def button_callback(channel):
-    print('==============')
-    print("button pushed")
-    print("Sending data")
-    data = ProtocolGenerator("/button", "1")
-    ws.send(data.create())
-    print('==============')
+btn = Button("Button", "1")
+btn.start()
 
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
-
-GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
-
-GPIO.add_event_detect(15, GPIO.RISING, callback=button_callback)
-
-while True:
-    print('Waiting for a push')
-    time.sleep(10)
