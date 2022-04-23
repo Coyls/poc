@@ -1,6 +1,5 @@
 from typing import List
 
-
 class ProtocolGenerator:
 
     def __init__(self, key: str, value: str):

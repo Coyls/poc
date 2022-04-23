@@ -41,7 +41,7 @@ class Sensor:
     
     def setLastActivation(self):
         print("Set last trigger : ", datetime.now())
-        file = open("last-trigger.txt", "w")
+        file = open("./db/last-trigger.txt", "w")
         file.write(f"{datetime.now()}")
         self.lastTrigger = datetime.now()
 
@@ -55,7 +55,7 @@ class Storage:
     proximity = Sensor(100, "empty.txt")
     temp = Sensor(10, "empty.txt")
     switch = Sensor(10,"empty.txt")
-    humidityGround = Sensor(10, "last-trigger.txt")
+    humidityGround = Sensor(10, "./db/last-trigger.txt")
 
     def setValue(self, key: str, val: str):
         if key == "/button":
