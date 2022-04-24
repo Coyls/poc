@@ -1,36 +1,35 @@
-from pydoc import cli
 from typing import Any, List
 from simple_websocket_server import WebSocketServer, WebSocket
 from protocol import ProtocolDecodeur
 from datetime import date, datetime, time
 import subprocess
+from plant import Plant
 
 class ConnectionManager:
     clients = {}
     discClients : list[str] = []
 
     def addClient(self,client : Any):
+        print(client.address, 'connected')
         self.clients[client] = ""
 
     def setClientName(self,client : Any, name : str):
         self.clients[client] = name
 
     def removeClient(self,client : Any):
+        print(client.address, 'closed')
         print(self.clients[client], " disconnected")
         self.discClients.append(self.clients[client])
         self.clients.pop(client)
         
-    
 class Sensor:
     value = 0
     lastTrigger = datetime(2000,1,1)
 
     def __init__(self, delta : int, filePath :str ):
         self.delta = delta
-
         file = open(filePath, "r")
         lastTrigger = file.readline()
-        print(lastTrigger)
         if lastTrigger != "":
             self.lastTrigger = datetime.strptime(lastTrigger, '%Y-%m-%d %H:%M:%S.%f')
 
@@ -73,7 +72,6 @@ class Storage:
             self.humidityGround.setValue(int(val))
             subprocess.run(['espeak','-vfr+f4','-s150', "Merci Humain !"])
             
-        
 class Command:
 
     def __init__(self, cmd: str) -> None:
@@ -81,8 +79,6 @@ class Command:
 
     def use(self):
         return subprocess.run(self.cmd.split(" "))
-
-
 
 class Hub:
 
@@ -106,30 +102,25 @@ class Hub:
                 print(last)
                 time.sleep(2)
 
-            
 
+class SensorConnection(WebSocket):
 
-
-class SimpleChat(WebSocket):
-
-    hub = Hub()
-    
+    # hub = Hub()
     def handle(self):
-        self.hub.handle(self)
+        # self.hub.handle(self)
+        print("Data received !")
+        print(server.listeners)
+        print(server.connections)
 
-        
     def connected(self):
-        print(self.address, 'connected')
         connectionManager.addClient(self)
         
-
     def handle_close(self):
-        print(self.address, 'closed')
         connectionManager.removeClient(self)
-        
-clients = []
-connectionManager = ConnectionManager()
-  
 
-server = WebSocketServer('', 8000, SimpleChat)
+
+connectionManager = ConnectionManager()
+
+
+server = WebSocketServer('', 8000, SensorConnection)
 server.serve_forever()

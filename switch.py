@@ -6,7 +6,6 @@ from __future__ import print_function
 import sys
 import os
 import time
-from abc import abstractmethod
 
 from blue_st_sdk.manager import Manager
 from blue_st_sdk.manager import ManagerListener
@@ -32,9 +31,9 @@ ws = create_connection("ws://localhost:8000")
 
 time.sleep(2)
 
-# name = ProtocolGenerator("/name", "switch")
+name = ProtocolGenerator("/name", "switch")
 
-# ws.send(name.create())
+ws.send(name.create())
 
 # FUNCTIONS
 
@@ -59,7 +58,7 @@ class MyManagerListener(ManagerListener):
     # @param manager Manager instance that starts/stops the process.
     # @param enabled True if a new discovery starts, False otherwise.
     #
-    def on_discovery_change(self, manag56418er, enabled):
+    def on_discovery_change(self, manager, enabled):
         print('Discovery %s.' % ('started' if enabled else 'stopped'))
         if not enabled:
             print()
