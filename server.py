@@ -1,3 +1,4 @@
+from mimetypes import init
 from typing import Any, List
 from simple_websocket_server import WebSocketServer, WebSocket
 from protocol import ProtocolDecodeur
@@ -9,14 +10,14 @@ class ConnectionManager:
     clients = {}
     discClients : list[str] = []
 
-    def addClient(self,client : Any):
+    def addClient(self,client : WebSocket):
         print(client.address, 'connected')
         self.clients[client] = ""
 
-    def setClientName(self,client : Any, name : str):
+    def setClientName(self,client : WebSocket, name : str):
         self.clients[client] = name
 
-    def removeClient(self,client : Any):
+    def removeClient(self,client : WebSocket):
         print(client.address, 'closed')
         print(self.clients[client], " disconnected")
         self.discClients.append(self.clients[client])
@@ -84,13 +85,13 @@ class Hub:
 
     storage = Storage()
 
-    def handle(self, client: Any):
+    def handle(self, client: WebSocket):
         dataTr = ProtocolDecodeur(client.data)
         [key, val] = dataTr.getKeyValue()
 
         if key == "/name":
             print(key , val)
-            connectionManager.setClientName(client,val)
+            client.connectionManager.setClientName(client,val)
         else:
             self.storage.setValue(key, val)
 
@@ -106,20 +107,18 @@ class Hub:
 class SensorConnection(WebSocket):
 
     # hub = Hub()
+    connectionManager = ConnectionManager()
+
     def handle(self):
         # self.hub.handle(self)
         print("Data received !")
-        print(server.listeners)
-        print(server.connections)
+        
 
     def connected(self):
-        connectionManager.addClient(self)
+        self.connectionManager.addClient(self)
         
     def handle_close(self):
-        connectionManager.removeClient(self)
-
-
-connectionManager = ConnectionManager()
+        self.connectionManager.removeClient(self)
 
 
 server = WebSocketServer('', 8000, SensorConnection)

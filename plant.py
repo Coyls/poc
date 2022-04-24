@@ -1,5 +1,7 @@
 from typing import Any
 from plantState import GlobalState, SetupState, StandbyAfterSetup, TutorielState, SleepState, WakeUpState, AwakeState, StandbyAfterAwake
+from simple_websocket_server import WebSocketServer
+# from server import SensorConnection, ConnectionManager
 
 class Plant:
 
@@ -7,6 +9,7 @@ class Plant:
 
     def __init__(self) -> None:
         self.state = SetupState(self)
+        print("New Instance")
 
     """ def rooting(self, client: Any):
         pass """
@@ -24,7 +27,11 @@ class Plant:
         self.state = state
 
 
+""" plant = Plant()
+pl = Plant()
 
+
+print(plant == pl) """
 
 """ plt = Plant()
 
