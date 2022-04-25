@@ -1,6 +1,5 @@
 import time
 
-
 class GlobalState:
 
     # ! plant : Plant --> pas possible d'importer ou de setup
@@ -28,19 +27,21 @@ class SetupState(GlobalState):
 
     def afterProcess(self):
         print("Wait for all connection")
-        self.plant.waitForAllConnection()
-        print("Go to StandbyAfterSetup")
-        self.plant.setState(StandbyAfterSetup(self.plant))
+        isOk = self.waitForAllConnection()
+        print("isOk", isOk)
+        if isOk:
+            print("Go to StandbyAfterSetup")
+            self.plant.setState(StandbyAfterSetup(self.plant))
     
     # ----------------------------------------
 
-    def waitForAllConnection(self):
-        nbConnection = 0
-        while nbConnection < 4:
-            print(nbConnection, "/4 sensors connected !")
-            time.sleep(0.5)
-
-
+    def waitForAllConnection(self) -> bool:
+        nb = len(self.plant.connectionManager.clients)
+        if (nb >= 2):
+            return True
+        else:
+            return False
+        
 
 class StandbyAfterSetup(GlobalState):
     # Wait for user action or pass
@@ -53,8 +54,15 @@ class StandbyAfterSetup(GlobalState):
         pass
 
     def afterProcess(self):
+        time.sleep(10)
         print("Go to SleepState")
         self.plant.setState(SleepState(self.plant))
+
+    # ----------------------------------------
+
+    def waitForDelay(self) -> bool:
+        time.sleep(10)
+        return True
 
 class TutorielState(GlobalState):
     def handleSwitch(self):
@@ -67,7 +75,6 @@ class TutorielState(GlobalState):
         print("Play tutorial")
         print("Go to SleepState")
         self.plant.setState(SleepState(self.plant))
-
 
 class SleepState(GlobalState):
     def handleSwitch(self):
@@ -117,25 +124,6 @@ class StandbyAfterAwake(GlobalState):
         print("Go to SleepState")
         self.plant.setState(SleepState(self.plant))
 
-
-class Plant:
-
-    state : GlobalState
-
-    def __init__(self) -> None:
-        self.state = SetupState(self)
-
-    def handleSwitch(self):
-        self.state.handleSwitch()
-
-    def handleProximity(self):
-        self.state.handleProximity()
-
-    def process(self):
-        self.state.afterProcess()
-
-    def setState(self, state : GlobalState):
-        self.state = state
 
 
 

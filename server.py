@@ -1,4 +1,3 @@
-from mimetypes import init
 from typing import Any, List
 from simple_websocket_server import WebSocketServer, WebSocket
 from protocol import ProtocolDecodeur
@@ -6,23 +5,7 @@ from datetime import date, datetime, time
 import subprocess
 from plant import Plant
 
-class ConnectionManager:
-    clients = {}
-    discClients : list[str] = []
 
-    def addClient(self,client : WebSocket):
-        print(client.address, 'connected')
-        self.clients[client] = ""
-
-    def setClientName(self,client : WebSocket, name : str):
-        self.clients[client] = name
-
-    def removeClient(self,client : WebSocket):
-        print(client.address, 'closed')
-        print(self.clients[client], " disconnected")
-        self.discClients.append(self.clients[client])
-        self.clients.pop(client)
-        
 class Sensor:
     value = 0
     lastTrigger = datetime(2000,1,1)
@@ -106,19 +89,16 @@ class Hub:
 
 class SensorConnection(WebSocket):
 
-    # hub = Hub()
-    connectionManager = ConnectionManager()
-
+    plant = Plant()
+    
     def handle(self):
-        # self.hub.handle(self)
-        print("Data received !")
+        self.plant.handle(self)
         
-
     def connected(self):
-        self.connectionManager.addClient(self)
+        self.plant.connectionManager.addClient(self)
         
     def handle_close(self):
-        self.connectionManager.removeClient(self)
+        self.plant.connectionManager.removeClient(self)
 
 
 server = WebSocketServer('', 8000, SensorConnection)
