@@ -15,7 +15,7 @@ class GroudHumiditySensor:
                 self.initName()
         
         def initName(self):
-                data = ProtocolGenerator("/name", self.name)
+                data = ProtocolGenerator("name", self.name)
                 self.ws.send(data.create())
         
         def start(self):
@@ -30,7 +30,7 @@ class GroudHumiditySensor:
                 GPIO.add_event_callback(self.SENSOR_PIN, callback=self.sensor_callback)  # assign function to GPIO PIN, Run function on change
 
         def sensor_callback(self,channel):
-                data = ProtocolGenerator("/humidity-ground", self.data)
+                data = ProtocolGenerator(self.name, self.data)
                 rdyToSend = data.create()
                 if GPIO.input(channel):
                         print("Water Detected!")
@@ -40,5 +40,5 @@ class GroudHumiditySensor:
                         self.ws.send(rdyToSend)
 
 
-GrndHum = GroudHumiditySensor("GroundHumidity", "1")
+GrndHum = GroudHumiditySensor("humidity-ground", "1")
 GrndHum.start()

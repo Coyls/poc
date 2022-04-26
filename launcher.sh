@@ -10,4 +10,5 @@ python3 ./tmp.py &
 python3 ./proximity.py &
 python3 ./rotary.py &
 python3 ./ground-humidity.py &
+python3 ./delay.py &
 sudo python3 ./switch.py &

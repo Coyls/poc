@@ -9,3 +9,4 @@ sudo pkill -f proximity.py
 sudo pkill -f rotary.py 
 sudo pkill -f ground-humidity.py &
 sudo pkill -f switch.py 
+sudo pkill -f delay.py 

@@ -31,9 +31,10 @@ ws = create_connection("ws://localhost:8000")
 
 time.sleep(2)
 
-name = ProtocolGenerator("/name", "switch")
+name = "switch"
+sendName =ProtocolGenerator("name", name)
 
-ws.send(name.create())
+ws.send(sendName.create())
 
 # FUNCTIONS
 
@@ -153,7 +154,7 @@ def main(argv):
 
 
             print("Connected !")
-            data = ProtocolGenerator("/switch", "1")
+            data = ProtocolGenerator(name, "1")
             ws.send(data.create())
             print("Data send, sleep 10s and loop")
             time.sleep(10)

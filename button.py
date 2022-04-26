@@ -20,7 +20,7 @@ class Button:
             time.sleep(10)
 
     def initName(self):
-        data = ProtocolGenerator("/name", self.name)
+        data = ProtocolGenerator("name", self.name)
         self.ws.send(data.create())
 
     def setupHardware(self):
@@ -33,12 +33,12 @@ class Button:
         print('==============')
         print("button pushed")
         print("Sending data")
-        data = ProtocolGenerator("/button", self.data)
+        data = ProtocolGenerator(self.name, self.data)
         self.ws.send(data.create())
         print('==============')
 
 
-btn = Button("Button", "1")
+btn = Button("button", "1")
 btn.start()
 
 

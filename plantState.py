@@ -18,7 +18,8 @@ class GlobalState:
 
 class SetupState(GlobalState):
     # Wait for all connections
-    
+    twofa = 1
+
     def handleSwitch(self):
         pass
 
@@ -31,20 +32,30 @@ class SetupState(GlobalState):
         print("isOk", isOk)
         if isOk:
             print("Go to StandbyAfterSetup")
-            self.plant.setState(StandbyAfterSetup(self.plant))
+            self.plant.setState(StandbyAfterSetup(self.plant,30))
     
     # ----------------------------------------
 
     def waitForAllConnection(self) -> bool:
         nb = len(self.plant.connectionManager.clients)
-        if (nb >= 2):
+        
+        if (nb >= 3 and self.twofa >= 3):
             return True
         else:
+            self.twofa += 1
             return False
         
 
 class StandbyAfterSetup(GlobalState):
     # Wait for user action or pass
+
+    def __init__(self, plant,delay: int):
+        super().__init__(plant)
+        self.delay = delay
+        cls = plant.connectionManager.clients
+        res = dict((v,k) for k,v in cls.items())
+        cl = res["eureka"]
+        cl.send_message(str(self.delay))
 
     def handleSwitch(self):
         print("Go to TutorielState")
@@ -54,15 +65,9 @@ class StandbyAfterSetup(GlobalState):
         pass
 
     def afterProcess(self):
-        time.sleep(10)
+        # print(self.plant.storage.createStore())
         print("Go to SleepState")
         self.plant.setState(SleepState(self.plant))
-
-    # ----------------------------------------
-
-    def waitForDelay(self) -> bool:
-        time.sleep(10)
-        return True
 
 class TutorielState(GlobalState):
     def handleSwitch(self):

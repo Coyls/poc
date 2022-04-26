@@ -7,7 +7,7 @@ class ProtocolGenerator:
         self.value = value
 
     def create(self) -> str:
-        return f"{self.key}:{self.value}"
+        return f"/{self.key}:{self.value}"
 
 
 class ProtocolDecodeur:

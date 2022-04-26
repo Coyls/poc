@@ -24,7 +24,7 @@ class TemperatureSensor:
             time.sleep(10)
 
     def initName(self):
-        data = ProtocolGenerator("/name", self.name)
+        data = ProtocolGenerator("name", self.name)
         self.ws.send(data.create())
 
     def setupHardware(self):
@@ -41,9 +41,9 @@ class TemperatureSensor:
         return tmp
 
     def sendTemp(self, tmp : str):
-        data = ProtocolGenerator("/temp",tmp)
+        data = ProtocolGenerator(self.name,tmp)
         self.ws.send(data.create())
 
 
-tmp = TemperatureSensor("Temperature")
+tmp = TemperatureSensor("temperature")
 tmp.start()

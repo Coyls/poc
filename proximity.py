@@ -24,7 +24,7 @@ class ProximitySensor:
                 GPIO.cleanup()
 
     def initName(self):
-        data = ProtocolGenerator("/name", self.name)
+        data = ProtocolGenerator("name", self.name)
         self.ws.send(data.create())
 
     def setupHardware(self):
@@ -33,9 +33,9 @@ class ProximitySensor:
         GPIO.add_event_detect(self.SENSOR_PIN , GPIO.RISING, callback=self.sensor_callback)
 
     def sensor_callback(self,channel):
-        data = ProtocolGenerator("/proximity", self.data)
+        data = ProtocolGenerator(self.name, self.data)
         self.ws.send(data.create())
         print('There was a movement!')
 
-prx = ProximitySensor("Proximity", "1")
+prx = ProximitySensor("proximity", "1")
 prx.start()
