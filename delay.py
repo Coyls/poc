@@ -2,13 +2,12 @@
 import websocket
 import RPi.GPIO as GPIO
 import time
-from protocol import ProtocolGenerator
+from protocol import ProtocolDecodeur, ProtocolGenerator
 
 class Eureka:
 
-    def __init__(self, name : str, data : str) -> None:
+    def __init__(self, name : str) -> None:
         self.name = name
-        self.data = data
         
     def start(self,ws):
         self.initName(ws)
@@ -17,14 +16,19 @@ class Eureka:
         data = ProtocolGenerator("name", self.name)
         ws.send(data.create())
 
-erk = Eureka("eureka", "1")
+erk = Eureka("eureka")
+
+def decodeData(data : str) -> list[str]:
+        dataTr = ProtocolDecodeur(data)
+        return dataTr.getKeyValue()
 
 def on_message(ws, message):
-    print("Delai de ", message, " second !")
-    delay = int(message)
+    [key, val] = decodeData(message)
+    print("Delai de ", val, " second pour le state : ", key)
+    delay = int(val)
     time.sleep(delay)
     print("Send after delay")
-    data = ProtocolGenerator(erk.name, "1")
+    data = ProtocolGenerator(erk.name, key[1:])
     ws.send(data.create())
 
 def on_error(ws, error):

@@ -50,6 +50,9 @@ class Plant:
     def handleProximity(self):
         self.state.handleProximity()
 
+    def handleDelay(self, stateName : str):
+        self.state.handleDelay(stateName)
+
     def process(self):
         self.state.afterProcess()
 
@@ -70,8 +73,8 @@ class Plant:
             print(self.state)
 
         if key == "/eureka":
-            self.process()
-            print(self.state)
+            self.handleDelay(val)
+            print("/eureka : ",self.state)
 
         if key == "/switch":
             self.handleSwitch()
@@ -82,11 +85,11 @@ class Plant:
             print("/proximity : ",self.state)
 
         if key == "/humidity-ground":
-            print(key ," : ", val)
+            print(key ,":", val)
         
         if key == "/temperature":
-            print(key ," : ", val)
+            print(key ,":", val)
 
         if key == "/button":
-            print(key ," : ", val)
+            print(key ,":", val)
         

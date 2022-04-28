@@ -9,7 +9,6 @@ class ProtocolGenerator:
     def create(self) -> str:
         return f"/{self.key}:{self.value}"
 
-
 class ProtocolDecodeur:
 
     def __init__(self, msg: str) -> None:

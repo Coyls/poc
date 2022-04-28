@@ -1,6 +1,8 @@
-import time
+from protocol import ProtocolDecodeur, ProtocolGenerator
+
 
 class GlobalState:
+    stateName : str
 
     # ! plant : Plant --> pas possible d'importer ou de setup
     # ! l'IDE dectect un import circulair + class declarer avant son initialisation 
@@ -13,17 +15,26 @@ class GlobalState:
     def handleProximity(self):
         pass
 
+    def handleDelay(self,  acces : str):
+        pass
+
     def afterProcess(self):
         pass
 
 class SetupState(GlobalState):
     # Wait for all connections
+
+    stateName = "setup-state"
+
     twofa = 1
 
     def handleSwitch(self):
         pass
 
     def handleProximity(self):
+        pass
+
+    def handleDelay(self,  acces : str):
         pass
 
     def afterProcess(self):
@@ -40,6 +51,7 @@ class SetupState(GlobalState):
         nb = len(self.plant.connectionManager.clients)
         
         if (nb >= 3 and self.twofa >= 3):
+            print("ONOK : ", self.plant.connectionManager.clients)
             return True
         else:
             self.twofa += 1
@@ -48,14 +60,17 @@ class SetupState(GlobalState):
 
 class StandbyAfterSetup(GlobalState):
     # Wait for user action or pass
+    stateName = "standby-after-setup"
 
     def __init__(self, plant,delay: int):
+        #!!!!!!! BUG ICI QUI DECO LE DERNIER SCRIPT CONNECTER !!!!!!!!!!
         super().__init__(plant)
         self.delay = delay
         cls = plant.connectionManager.clients
         res = dict((v,k) for k,v in cls.items())
         cl = res["eureka"]
-        cl.send_message(str(self.delay))
+        data = ProtocolGenerator(self.stateName,str(self.delay))
+        cl.send_message(data)
 
     def handleSwitch(self):
         print("Go to TutorielState")
@@ -64,35 +79,69 @@ class StandbyAfterSetup(GlobalState):
     def handleProximity(self):
         pass
 
-    def afterProcess(self):
-        # print(self.plant.storage.createStore())
+    def handleDelay(self,  acces : str):
         print("Go to SleepState")
-        self.plant.setState(SleepState(self.plant))
+        if (acces == self.stateName):
+            self.plant.setState(SleepState(self.plant))
+
+    def afterProcess(self):
+        pass
+        
 
 class TutorielState(GlobalState):
+
+    stateName = "tutoriel-state"
+
     def handleSwitch(self):
         pass
 
     def handleProximity(self):
         pass
 
+    def handleDelay(self,  acces : str):
+        pass
+
     def afterProcess(self):
-        print("Play tutorial")
+        self.playTutorial()
         print("Go to SleepState")
         self.plant.setState(SleepState(self.plant))
 
+    # ----------------------------------------
+
+    def playTutorial(self):
+        print("Play tutorial")
+
+
 class SleepState(GlobalState):
+    
+    stateName = "sleep-state"
+
     def handleSwitch(self):
         pass
 
     def handleProximity(self):
         print("Go to WakeUpState")
-        self.plant.setState(WakeUpState(self.plant))
+        self.plant.setState(WakeUpState(self.plant, 10))
+
+    def handleDelay(self,  acces : str):
+        pass
 
     def afterProcess(self):
         pass
 
 class WakeUpState(GlobalState):
+
+    stateName = "wake-up-state"
+
+    def __init__(self, plant,delay: int):
+        super().__init__(plant)
+        self.delay = delay
+        cls = plant.connectionManager.clients
+        res = dict((v,k) for k,v in cls.items())
+        cl = res["eureka"]
+        data = ProtocolGenerator(self.stateName,str(self.delay))
+        cl.send_message(data)
+
     def handleSwitch(self):
         print("Go To AwakeState")
         self.plant.setState(AwakeState(self.plant))
@@ -100,23 +149,45 @@ class WakeUpState(GlobalState):
     def handleProximity(self):
         pass
 
+    def handleDelay(self,  acces : str):
+        print("Go to SleepState")
+        if (acces == self.stateName):
+            self.plant.setState(SleepState(self.plant))
+
     def afterProcess(self):
         pass
 
 class AwakeState(GlobalState):
+
+    stateName = "awake-state"
+
     def handleSwitch(self):
         pass
 
     def handleProximity(self):
         pass
 
+    def handleDelay(self,  acces : str):
+        pass
+
     def afterProcess(self):
         print("Go To StandbyAfterAwake")
-        self.plant.setState(StandbyAfterAwake(self.plant))
+        print("Systeme/Miror/jsp")
+        self.plant.setState(StandbyAfterAwake(self.plant, 10))
 
 
 class StandbyAfterAwake(GlobalState):
-    # Wait for user action or pass
+
+    stateName = "standby-after-awake"
+    
+    def __init__(self, plant,delay: int):
+        super().__init__(plant)
+        self.delay = delay
+        cls = plant.connectionManager.clients
+        res = dict((v,k) for k,v in cls.items())
+        cl = res["eureka"]
+        data = ProtocolGenerator(self.stateName,str(self.delay))
+        cl.send_message(data)
 
     def handleSwitch(self):
         print("Go to AwakeState")
@@ -125,10 +196,12 @@ class StandbyAfterAwake(GlobalState):
     def handleProximity(self):
         pass
 
-    def afterProcess(self):
+    def handleDelay(self,  acces : str):
         print("Go to SleepState")
-        self.plant.setState(SleepState(self.plant))
+        if (acces == self.stateName):
+            self.plant.setState(SleepState(self.plant))
 
-
+    def afterProcess(self):
+        pass
 
 
