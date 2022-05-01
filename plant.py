@@ -23,13 +23,35 @@ class ConnectionManager:
 
 # !! PAS FINI
 class Storage:
-    store : dict[str,dict[str,Any]]
+    store : dict[str, str] = {}
+    notStored = ["eureka", "button"]
+    dbPath = './db/db.txt' 
 
     def __init__(self, connectionManager : ConnectionManager):
         self.connectionManager = connectionManager
 
+    def InitStorage(self):
+        self.createFile()
+        self.createStore()
+        self.InitValueStore()
+
+    def InitValueStore(self):
+        # Parcourir tous le fichier pour extraire chaque valeur existante
+        pass
+
     def createStore(self):
-        print("createStore : ",self.connectionManager.clients)
+        cl = self.connectionManager.clients
+        for key, value in cl.items():
+            if value in self.notStored:
+                pass
+            else:
+                self.store[value] = ""
+        print(self.store)
+
+
+    def createFile(self):
+        open(self.dbPath, "w")
+
         
 class Plant:
 

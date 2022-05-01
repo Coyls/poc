@@ -24,11 +24,11 @@ def decodeData(data : str) -> list[str]:
 
 def on_message(ws, message):
     [key, val] = decodeData(message)
-    print("Delai de ", val, " second pour le state : ", key)
     delay = int(val)
     time.sleep(delay)
     print("Send after delay")
     data = ProtocolGenerator(erk.name, key[1:])
+    print("Delai de ", val, " second pour le state : ", key[1:])
     ws.send(data.create())
 
 def on_error(ws, error):

@@ -51,7 +51,8 @@ class SetupState(GlobalState):
         nb = len(self.plant.connectionManager.clients)
         
         if (nb >= 3 and self.twofa >= 3):
-            print("ONOK : ", self.plant.connectionManager.clients)
+            # print("ONOK : ", self.plant.connectionManager.clients)
+            self.plant.storage.InitStorage()
             return True
         else:
             self.twofa += 1
@@ -63,14 +64,13 @@ class StandbyAfterSetup(GlobalState):
     stateName = "standby-after-setup"
 
     def __init__(self, plant,delay: int):
-        #!!!!!!! BUG ICI QUI DECO LE DERNIER SCRIPT CONNECTER !!!!!!!!!!
         super().__init__(plant)
         self.delay = delay
         cls = plant.connectionManager.clients
         res = dict((v,k) for k,v in cls.items())
         cl = res["eureka"]
         data = ProtocolGenerator(self.stateName,str(self.delay))
-        cl.send_message(data)
+        cl.send_message(data.create())
 
     def handleSwitch(self):
         print("Go to TutorielState")
