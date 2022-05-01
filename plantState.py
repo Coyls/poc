@@ -42,7 +42,8 @@ class SetupState(GlobalState):
         isOk = self.waitForAllConnection()
         print("isOk", isOk)
         if isOk:
-            print("Go to StandbyAfterSetup")
+            self.plant.storage.InitStorage()
+            print("Go to StandbyAfterSetup after init storage !")
             self.plant.setState(StandbyAfterSetup(self.plant,30))
     
     # ----------------------------------------
@@ -51,8 +52,7 @@ class SetupState(GlobalState):
         nb = len(self.plant.connectionManager.clients)
         
         if (nb >= 3 and self.twofa >= 3):
-            # print("ONOK : ", self.plant.connectionManager.clients)
-            self.plant.storage.InitStorage()
+            # print("Clients : ", self.plant.connectionManager.clients)
             return True
         else:
             self.twofa += 1
