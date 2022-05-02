@@ -48,7 +48,6 @@ class Storage:
                 self.store[value] = ""
         print(self.store)
 
-
     def createFile(self):
         open(self.dbPath, "w")
 
