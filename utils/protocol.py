@@ -16,7 +16,6 @@ class DbLineDecodeur:
         msg = self.msg[:-1]
         return msg.split("|")
 
-
 class ProtocolGenerator:
 
     def __init__(self, key: str, value: str):

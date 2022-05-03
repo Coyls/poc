@@ -24,4 +24,4 @@
 - **CLK** --> GPIO 17
 - **DT** --> GPIO 18
 
-![GPIO](GPIO.png)
+![GPIO](./images/GPIO.png)

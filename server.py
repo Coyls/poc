@@ -85,7 +85,6 @@ class Hub:
                 subprocess.run(['espeak','-vfr+f4','-s150', last])
                 print(last)
                 time.sleep(2)
-
  """
 class SensorConnection(WebSocket):
 

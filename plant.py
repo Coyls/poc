@@ -2,68 +2,10 @@ import datetime
 from typing import Any
 from plantState import GlobalState, SetupState
 from simple_websocket_server import WebSocket
+from utils.connectionManager import ConnectionManager
+from utils.protocol import ProtocolDecodeur
+from utils.storage import Storage
 
-from utils.protocol import DbLineDecodeur, ProtocolDecodeur
-from utils.fileManager import FileManager
-
-class ConnectionManager:
-    clients : dict[WebSocket, str] = {}
-    discClients : list[str] = []
-
-    def addClient(self,client : WebSocket):
-        print(client.address, 'connected')
-        self.clients[client] = ""
-
-    def setClientName(self,client : WebSocket, name : str):
-        self.clients[client] = name
-
-    def removeClient(self,client : WebSocket):
-        print(client.address, 'closed')
-        print(self.clients[client], " disconnected")
-        self.discClients.append(self.clients[client])
-        self.clients.pop(client)
-
-class Storage:
-    store : dict[str, str] = {}
-    notStored = ["eureka", "button"]
-    fileManager = FileManager('./db/db.txt')
-
-    def __init__(self, connectionManager : ConnectionManager):
-        self.connectionManager = connectionManager
-
-    def InitStorage(self):
-        self.createFile()
-        self.createStore()
-        self.InitValueStore()
-
-    def InitValueStore(self):
-        lines = self.fileManager.getLines()
-        for line in lines:
-            l = DbLineDecodeur(line)
-            [key, val] = l.getKeyValue()
-            self.store[key] = val
-        print(self.store)
-        
-
-    def createStore(self):
-        cl = self.connectionManager.clients
-        for key, value in cl.items():
-            if value in self.notStored:
-                pass
-            else:
-                self.store[value] = ""
-        print(self.store)
-
-    def createFile(self):
-        self.fileManager.createFile()
-
-    def saveOnFile(self, key:str, data:str):
-        self.fileManager.addValue(key, data)
-
-    def saveOnStore(self, key:str, data:str):
-        self.store[key] = data
-
-        
 class Plant:
 
     state : GlobalState
@@ -119,9 +61,12 @@ class Plant:
 
         if key == "/humidity-ground":
             print(key ,":", val)
+            self.storage.saveOnFile(key, str(datetime.datetime.now()))
+            self.storage.saveOnStore(key, str(datetime.datetime.now()))
         
         if key == "/temperature":
             print(key ,":", val)
+            self.storage.saveOnStore(key, val)
 
         if key == "/button":
             print(key ,":", val)
