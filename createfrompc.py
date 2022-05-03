@@ -1,5 +1,5 @@
 from typing import List
-from protocol import DbLineGenerator
+from utils.protocol import DbLineGenerator
 dbPath = './db/db.txt'
 
 
@@ -35,5 +35,5 @@ def addValue(key: str, data: str):
 
 
 
-addValue('switch', "test")
+addValue('switch', "data")
 

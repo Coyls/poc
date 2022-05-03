@@ -1,7 +1,7 @@
 import RPi.GPIO as GPIO
 import time
 from websocket import create_connection
-from protocol import ProtocolGenerator
+from utils.protocol import ProtocolGenerator
 
 class ProximitySensor:
     SENSOR_PIN = 23

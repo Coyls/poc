@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 import dht11
 import time
 import math
-from protocol import ProtocolGenerator
+from utils.protocol import ProtocolGenerator
 
 class TemperatureSensor:
     SENSOR_PIN = 14

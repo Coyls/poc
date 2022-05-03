@@ -11,7 +11,7 @@ from blue_st_sdk.manager import Manager
 from blue_st_sdk.manager import ManagerListener
 from blue_st_sdk.node import NodeListener
 
-from protocol import ProtocolGenerator
+from utils.protocol import ProtocolGenerator
 from websocket import create_connection
 
 

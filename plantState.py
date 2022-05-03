@@ -1,4 +1,4 @@
-from protocol import ProtocolDecodeur, ProtocolGenerator
+from utils.protocol import ProtocolDecodeur, ProtocolGenerator
 
 
 class GlobalState:

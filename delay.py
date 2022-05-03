@@ -2,7 +2,7 @@
 import websocket
 import RPi.GPIO as GPIO
 import time
-from protocol import ProtocolDecodeur, ProtocolGenerator
+from utils.protocol import ProtocolDecodeur, ProtocolGenerator
 
 class Eureka:
 

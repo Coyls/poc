@@ -1,8 +1,9 @@
 from typing import Any
-from plantState import GlobalState, SetupState, StandbyAfterSetup, TutorielState, SleepState, WakeUpState, AwakeState, StandbyAfterAwake
+from plantState import GlobalState, SetupState
 from simple_websocket_server import WebSocket
 
-from protocol import ProtocolDecodeur
+from utils.protocol import ProtocolDecodeur
+from utils.fileManager import FileManager
 
 class ConnectionManager:
     clients : dict[WebSocket, str] = {}
@@ -25,7 +26,7 @@ class ConnectionManager:
 class Storage:
     store : dict[str, str] = {}
     notStored = ["eureka", "button"]
-    dbPath = './db/db.txt' 
+    fileManager = FileManager('./db/db.txt')
 
     def __init__(self, connectionManager : ConnectionManager):
         self.connectionManager = connectionManager
@@ -49,7 +50,13 @@ class Storage:
         print(self.store)
 
     def createFile(self):
-        open(self.dbPath, "w")
+        self.fileManager.createFile()
+
+    def saveOnFile(self, key:str, data:str):
+        self.fileManager.addValue(key, data)
+
+    def saveOnStore(self, key:str, data:str):
+        self.store[key] = data
 
         
 class Plant:

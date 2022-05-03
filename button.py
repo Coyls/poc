@@ -1,7 +1,7 @@
 from websocket import create_connection
 import RPi.GPIO as GPIO
 import time
-from protocol import ProtocolGenerator
+from utils.protocol import ProtocolGenerator
 
 class Button:
     SENSOR_PIN = 12
