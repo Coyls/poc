@@ -6,8 +6,12 @@ class FileManager:
         self.filePath = filePath
 
     def createFile(self):
-        f = open(self.filePath, "w")
-        f.close()
+        try:
+            f = open(self.filePath, "x")
+            f.close()
+        except:
+            print("File already exist !")
+        
 
     def getLines(self) -> list[str]:
         f = open(self.filePath, "r")
@@ -15,26 +19,23 @@ class FileManager:
         f.close()
         return lines
 
-    def getIndexKey(key: str, lines: list[str]):
-        for i, line in enumerate(lines):
-            if key in line:
-                return i
-        return False
-    
-    def modifyLines(self,lines: list[str],data: str, index):
-        lines[index] = data if index else lines.append(data)
-        return lines
-
-    def createLines(self,lines):
+    def createLines(self,lines : list[str]):
         w = open(self.filePath, "w")
         w.writelines(lines)
         w.close()
 
     def addValue(self,key: str, data: str):
         lines = self.getLines()
-        index = self.getIndexKey(key, lines)
+        global id
+        id = -1
+        for i, line in enumerate(lines):
+            if key in line:
+                id = i
         rawData = DbLineGenerator(key,data)
         dataRdyToUse = rawData.create()
-        lines = self.modifyLines(lines, dataRdyToUse, index)
+        if id == -1:
+            lines.append(dataRdyToUse)
+        else:
+            lines[id] = dataRdyToUse
         self.createLines(lines)
         print(lines)

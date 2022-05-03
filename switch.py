@@ -3,6 +3,7 @@
 # IMPORT
 
 from __future__ import print_function
+import subprocess
 import sys
 import os
 import time
@@ -157,6 +158,7 @@ def main(argv):
             data = ProtocolGenerator(name, "1")
             ws.send(data.create())
             print("Data send, sleep 10s and loop")
+            # subprocess.run(['espeak','-vfr+f4','-s150', "Bonjour, Humain !"])
             time.sleep(10)
             device.disconnect()
             print('Disconnection done.')

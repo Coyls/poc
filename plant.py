@@ -1,8 +1,9 @@
+import datetime
 from typing import Any
 from plantState import GlobalState, SetupState
 from simple_websocket_server import WebSocket
 
-from utils.protocol import ProtocolDecodeur
+from utils.protocol import DbLineDecodeur, ProtocolDecodeur
 from utils.fileManager import FileManager
 
 class ConnectionManager:
@@ -22,7 +23,6 @@ class ConnectionManager:
         self.discClients.append(self.clients[client])
         self.clients.pop(client)
 
-# !! PAS FINI
 class Storage:
     store : dict[str, str] = {}
     notStored = ["eureka", "button"]
@@ -37,8 +37,13 @@ class Storage:
         self.InitValueStore()
 
     def InitValueStore(self):
-        # Parcourir tous le fichier pour extraire chaque valeur existante
-        pass
+        lines = self.fileManager.getLines()
+        for line in lines:
+            l = DbLineDecodeur(line)
+            [key, val] = l.getKeyValue()
+            self.store[key] = val
+        print(self.store)
+        
 
     def createStore(self):
         cl = self.connectionManager.clients

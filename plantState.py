@@ -1,3 +1,4 @@
+import datetime
 from utils.protocol import ProtocolDecodeur, ProtocolGenerator
 
 
@@ -44,7 +45,7 @@ class SetupState(GlobalState):
         if isOk:
             self.plant.storage.InitStorage()
             print("Go to StandbyAfterSetup after init storage !")
-            self.plant.setState(StandbyAfterSetup(self.plant,30))
+            self.plant.setState(StandbyAfterSetup(self.plant,10))
     
     # ----------------------------------------
 
@@ -52,7 +53,6 @@ class SetupState(GlobalState):
         nb = len(self.plant.connectionManager.clients)
         
         if (nb >= 3 and self.twofa >= 3):
-            # print("Clients : ", self.plant.connectionManager.clients)
             return True
         else:
             self.twofa += 1
@@ -121,6 +121,9 @@ class SleepState(GlobalState):
 
     def handleProximity(self):
         print("Go to WakeUpState")
+        date = datetime.datetime.now()
+        self.plant.storage.saveOnStore("proximity", str(date))
+        self.plant.storage.saveOnFile("proximity", str(date))
         self.plant.setState(WakeUpState(self.plant, 10))
 
     def handleDelay(self,  acces : str):
@@ -140,7 +143,7 @@ class WakeUpState(GlobalState):
         res = dict((v,k) for k,v in cls.items())
         cl = res["eureka"]
         data = ProtocolGenerator(self.stateName,str(self.delay))
-        cl.send_message(data)
+        cl.send_message(data.create())
 
     def handleSwitch(self):
         print("Go To AwakeState")
@@ -187,7 +190,7 @@ class StandbyAfterAwake(GlobalState):
         res = dict((v,k) for k,v in cls.items())
         cl = res["eureka"]
         data = ProtocolGenerator(self.stateName,str(self.delay))
-        cl.send_message(data)
+        cl.send_message(data.create())
 
     def handleSwitch(self):
         print("Go to AwakeState")

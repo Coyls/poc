@@ -6,15 +6,15 @@ class DbLineGenerator:
         self.value = value
 
     def create(self) -> str:
-        return f"{self.key}:{self.value}\n"
+        return f"{self.key}|{self.value}\n"
 
 class DbLineDecodeur:
     def __init__(self, msg: str) -> None:
         self.msg = msg
 
     def getKeyValue(self) -> List[str]:
-        msg = self.msg[:-2]
-        return msg.split(":")
+        msg = self.msg[:-1]
+        return msg.split("|")
 
 
 class ProtocolGenerator:
